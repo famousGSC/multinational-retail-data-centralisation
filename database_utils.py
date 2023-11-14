@@ -25,14 +25,12 @@ class DatabaseConnector:
 
     def list_db_tables(self, engine):
         inspector = inspect(engine)
-        #for table_name in inspector.get_table_names():
-        #    for column in inspector.get_columns(table_name):
-        #        print("Column: %s" % column['name'])
-        return inspector
+        for table_name in inspector.get_table_names():
+            for column in inspector.get_columns(table_name):
+                print("Column: %s" % column['name'])
         
 
 my_instance = DatabaseConnector()
 my_creds = my_instance.read_db_creds()
 my_engine = my_instance.init_db_engine(my_creds)
-my_tables = my_instance.list_db_tables(my_engine)
-print(my_tables)
+my_instance.list_db_tables(my_engine)
