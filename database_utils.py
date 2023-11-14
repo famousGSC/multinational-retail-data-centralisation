@@ -1,5 +1,6 @@
 import pandas as pd
 import yaml
+from sqlalchemy import create_engine
 
 class DatabaseConnector:
     def __init__(self):
@@ -12,9 +13,18 @@ class DatabaseConnector:
         return data_loaded 
 
     def init_db_engine(self, data_loaded):
-        ## Initialise and return a SQLalchemy engine
-        pass
-    
+        engine = create_engine(f"""
+            {'postgresql'}+
+            {'psycopg2'}://
+            {data_loaded['RDS_USER']}:
+            {data_loaded['RDS_PASSWORD']}@
+            {data_loaded['RDS_HOST']}:
+            {data_loaded['RDS_PORT']}/
+            {data_loaded['RDS_DATABASE']}""")
+        
+        return engine
 
-my_instance=DatabaseConnector()
-print(my_instance.read_db_creds())
+
+my_instance = DatabaseConnector()
+my_creds = my_instance.read_db_creds()
+print(my_creds['RDS_DATABASE'])
