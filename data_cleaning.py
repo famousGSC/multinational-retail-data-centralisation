@@ -1,3 +1,14 @@
+import pandas as pd
+
 class DataCleaning:
     def __init__(self):
-        ## Some code here
+        pass
+
+    def clean_user_data(self, df):
+        if df.isnull().values.any() == True:
+            print(f'Replacing {df.isnull().sum()} null values')
+            df = df.fillna('')
+        else:
+            print('No null values')
+        
+        
