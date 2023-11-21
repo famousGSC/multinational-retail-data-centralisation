@@ -28,6 +28,10 @@ class DatabaseConnector:
         print(inspector.get_table_names())
         
 
+    def upload_to_db(self, df, tablename):
+        df.to_sql(name=tablename, con=my_engine)
+        
+
 my_connector = DatabaseConnector()
 my_creds = my_connector.read_db_creds()
 my_engine = my_connector.init_db_engine(my_creds)
