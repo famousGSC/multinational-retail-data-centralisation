@@ -11,4 +11,9 @@ class DataCleaning:
         else:
             print('No null values')
         
-        
+    def clean_store_data(self, stores_df):
+        if df.isnull().values.any() == True:
+            print(f'Replacing {df.isnull().sum()} null values')
+            df = df.fillna('')
+        else:
+            print('No null values')
