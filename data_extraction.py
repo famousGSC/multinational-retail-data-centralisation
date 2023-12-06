@@ -2,6 +2,7 @@ from database_utils import DatabaseConnector
 import pandas as pd
 import tabula
 import requests
+#import boto3
 
 class DataExtractor:
     def __init__(self):
@@ -22,25 +23,64 @@ class DataExtractor:
         else:
             print('No null values')
         return df
-    
-    def list_number_of_stores(self, url, headers):
-        response = requests.get(url, headers)
-        if response.status_code == 200:
-            number_of_stores = response.json()
-        else:
-            print(f"Request failed with status code: {response.status_code}")
-            print(f"Response Text: {response.text}")
-        return number_of_stores
 
-    def retrieve_stores_data(self, endpoint):
-        response = requests.get(endpoint)
-        if response.status_code == 200:
-            data = response.json()
-            stores_df = pd.DataFrame(data)
-        else:
-            print(f"Request failed with status code: {response.status_code}")
-            print(f"Response Text: {response.text}")
-        return stores_df
+
+    def list_number_of_stores(self, header, number_of_stores_endpoint):
+        try:
+            response = requests.get(number_of_stores_endpoint, headers=header)
+            if response.status_code == 200:
+                number_of_stores = response.json().get('number_of_stores')
+                return number_of_stores
+            else:
+                print(f"Failed to retrieve number of stores. Status code: {response.status_code}")
+        except requests.RequestException as e:
+            print(f"Error: {e}")
+            return None
+        
+
+    def retrieve_stores_data(self, store_endpoint):
+        try:
+            number_of_stores = self.list_number_of_stores(number_of_stores_endpoint)
+            stores_data = []
+
+            if number_of_stores is not None:
+                for store_number in range(1, number_of_stores + 1):
+                    store_url = store_endpoint.format(store_number)
+                    response = requests.get(store_url, headers=self.header)
+                    if response.status_code == 200:
+                        store_details = response.json()
+                        stores_data.append(store_details)
+                    else:
+                        print(f"Failed to retrieve store {store_number}. Status code: {response.status_code}")
+
+                if stores_data:
+                    # Convert the list of store details into a Pandas DataFrame
+                    df = pd.DataFrame(stores_data)
+                    return df
+                else:
+                    print("No store data found.")
+                    return None
+        except requests.RequestException as e:
+            print(f"Error: {e}")
+            return None
+
+# Define the API key and endpoints
+header = {'x-api-key':'yFBQbwXe9J3sd6zWVAMrK6lcxxr0q1lr2PT6DDMX'}
+number_of_stores_endpoint = 'https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/number_stores'
+retrieve_store_endpoint = 'https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/store_details/{}'
+
+# Create an instance of DataExtractor and retrieve the number of stores
+data_extractor = DataExtractor()
+number_of_stores = data_extractor.list_number_of_stores(number_of_stores_endpoint, header)
+stores_dataframe = data_extractor.retrieve_stores_data(retrieve_store_endpoint)
+
+if stores_dataframe is not None:
+    print("Stores data successfully retrieved!")
+    print(stores_dataframe.head())  # Display the first few rows of the DataFrame
+
+
+
+
 
 # Instantiate connector
 my_connector = DatabaseConnector()

@@ -1,6 +1,6 @@
 import pandas as pd
 import yaml
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData, Table, Column, String, BigInteger, SmallInteger
 from sqlalchemy import inspect
 import psycopg2
 

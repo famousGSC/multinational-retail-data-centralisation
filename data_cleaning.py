@@ -17,3 +17,7 @@ class DataCleaning:
             df = df.fillna('')
         else:
             print('No null values')
+
+    def clean_orders_data(self, orders_df):
+        return orders_df.drop(columns=['first_name', 'last_name', '1'])
+    
